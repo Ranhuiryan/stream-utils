@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<!-- saved from url=(0121)https://gists.rawgit.com/sam0737/a0ee8ca253fc5c84b2aa2ac018f7b8ad/raw/108196e17c2c9d79ff60ed3bf788973ab94da9af/clock.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  
+  <title>A simple clock</title>
+
+</head>
+
+<body translate="no">
+  <div id="output"></div>
+
+  <script type="text/javascript">
+    window._AMapSecurityConfig = {
+        securityJsCode:'a86d16b21d10829a186c51707628249d',
+    }
+  </script>
+  <script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.15&key=516a3f4bd70111426f6204a6d603ccf0"></script> 
+  <script src='https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.18.1/moment.min.js'></script>
+  <script>
+    // https://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
+    var urlParams;
+    (function () {
+        var match,
+            pl     = /\+/g,  // Regex for replacing addition symbol with a space
+            search = /([^&=]+)=?([^&]*)/g,
+            decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
+            query  = window.location.search.substring(1);
+
+        urlParams = {};
+        while (match = search.exec(query))
+          urlParams[decode(match[1])] = decode(match[2]);
+    })();
+
+    var output = document.getElementById("output");
+    if (urlParams["style"]) output.setAttribute("style", urlParams["style"]);
+    if (urlParams["bodyStyle"]) document.body.setAttribute("style", urlParams["bodyStyle"]);
+
+    var str = [];
+    function getWeather() {
+      AMap.plugin('AMap.Weather', function() {
+        var weather = new AMap.Weather();
+        //查询实时天气信息, 查询的城市到行政级别的城市，如朝阳区、杭州市
+        weather.getLive('海淀区', function(err, data) {
+            if (!err) {
+                // str.push('<h4 >实时天气' + '</h4><hr>');
+                // str.push('<p>城市/区：' + data.city + '</p>');
+                // str.push('<p>天气：' + data.weather + '</p>');
+                // str.push('<p>温度：' + data.temperature + '℃</p>');
+                // str.push('<p>风向：' + data.windDirection + '</p>');
+                // str.push('<p>风力：' + data.windPower + ' 级</p>');
+                // str.push('<p>空气湿度：' + data.humidity + '</p>');
+                // str.push('<p>发布时间：' + data.reportTime + '</p>');
+                str.push(data.city);
+                str.push(data.weather);
+                str.push('气温 '+data.temperature + '℃');
+                str.push(data.windDirection + '风');
+                str.push(data.windPower + ' 级');
+                str.push('湿度 ' + data.humidity + ' %');
+                // str.push('<p>发布时间：' + data.reportTime + '</p>');
+            }
+        });
+      });
+    }
+    getWeather();
+
+    setInterval(
+      function() { 
+        str = []; 
+        getWeather();
+      }, 600000);
+
+    // var c;
+    setInterval(
+      function() {
+        output.innerText = moment().format("YYYY [年] M [月] D [号] HH:mm:ss")+'    '+str.join('  ');
+      }, 1000);
+    // c();
+  </script>
+
+
+</body></html>
